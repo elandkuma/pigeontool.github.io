@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>亂數抽籤程式</title>
+    <style>
+		h2 {
+			font-size: 40px; /* 調整標題文字大小為 40 像素 */
+			text-align: center; /* 調整標題置中 */
+		}
+		label {
+			font-size: 28px; /* 調整標籤文字大小為 28 像素 */
+		}
+		
+		button {
+			font-size: 28px; /* 調整按鈕文字大小為 28 像素 */
+		}
+		
+		/* 自訂「抽籤」按鈕 */
+		button#drawLottery {
+			font-size: 32px; /* 增加字型大小 */
+			padding: 8px 12px; /* 增加內距以放大按鈕 */
+			background-color: #4CAF50; /* 修改背景顏色 */
+			color: white; /* 修改文字顏色 */
+			border: none;
+			border-radius: 8px; /* 添加圓角 */
+			cursor: pointer;
+			transition: background-color 0.3s ease; /* 添加平滑的滑鼠懸停效果 */
+			}
+
+		button#drawLottery:hover {
+			background-color: #45a049; /* 滑鼠懸停時的深色背景顏色 */
+			}
+		
+		input[type="number"],
+		input[type="text"] {
+			font-size: 24px; /* 調整輸入框文字大小為 24 像素 */
+		}
+	
+        table {
+            border-collapse: collapse;
+            width: 95%;
+            margin: auto;
+            margin-top: 20px;
+        }
+		
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+		
+        th {
+            background-color: #f2f2f2;
+			font-size: 28px; /* 調整表格標題文字大小為 28 像素 */
+        }
+		
+		td {
+			font-size: 24px; /* 調整表格內容文字大小為 24 像素 */
+			font-family: '微軟正黑體', Arial, sans-serif;
+		}
+				
+		/* 調整序號和姓名的欄寬 */
+        th:nth-child(2n-1), td:nth-child(2n-1) {
+            width: 2.5%;
+        }
+        th:nth-child(2n), td:nth-child(2n) {
+            width: 6%;
+		}
+		
+		/* 新增抽籤結果資訊的樣式 */
+		#drawnInfo {
+			font-size: 20px;
+			margin-top: 10px;
+			text-align: center;
+		}
+		.drawn-number {
+			color: red;
+			font-weight: bold;
+			font-size: 36px;
+			font-family: '微軟正黑體', Arial, sans-serif;
+		}
+		.drawn-name {
+			color: blue;
+			font-weight: bold;
+			font-size: 36px;
+			font-family: '微軟正黑體', Arial, sans-serif;
+		}
+		
+    </style>
+</head>
+<body>
+    <h2>大羅東治水防災區段徵收抵價地抽籤－人序籤</h2>
+    <label for="participantCount">輸入總參與人數：</label>
+    <input type="number" id="participantCount">
+    <button onclick="generateLottery()">產製籤筒</button>
+
+    <label for="participantName">輸入姓名：</label>
+    <input type="text" id="participantName">
+    <button id="drawLottery" onclick="drawLottery()">抽籤</button>
+	
+
+	<!-- 新增導出按鈕 -->
+    <button onclick="exportToCSV()">匯出 CSV</button>
+	<div id="drawnInfo">
+		<span class="drawn-name" id="drawnName"></span>
+		抽籤號碼為：<span class="drawn-number" id="drawnNumber">未抽中</span>
+	</div>
+
+
+    <table>
+        <tr>
+            <th>序號</th>
+            <th>姓名</th>
+			<th>序號</th>
+            <th>姓名</th>
+			<th>序號</th>
+            <th>姓名</th>
+			<th>序號</th>
+            <th>姓名</th>
+			<th>序號</th>
+            <th>姓名</th>
+        </tr>
+        <tbody id="participantList">
+        </tbody>
+    </table>
+
+	
+
+    <script>
+        var participantCount = 0;
+        var drawnNumbers = [];
+
+        function generateLottery() {
+            participantCount = parseInt(document.getElementById("participantCount").value);
+            var participantList = document.getElementById("participantList");
+            drawnNumbers = [];
+
+            // Clear previous entries
+            participantList.innerHTML = "";
+
+            var rowCount = Math.ceil(participantCount / 5);
+            for (var i = 0; i < rowCount; i++) {
+                var row = participantList.insertRow();
+                for (var j = 1; j <= 5; j++) {
+                    var cell1 = row.insertCell();
+                    var cell2 = row.insertCell();
+                    var serialNumber = i * 5 + j;
+                    if (serialNumber <= participantCount) {
+                        cell1.innerHTML = serialNumber;
+                    } else {
+                        cell1.innerHTML = "";
+                    }
+                    cell2.innerHTML = "";
+                }
+            }
+        }
+
+        function drawLottery() {
+            var participantName = document.getElementById("participantName").value;
+            var participantList = document.getElementById("participantList");
+			var drawnNumberElement = document.getElementById("drawnNumber");
+            var drawnNameElement = document.getElementById("drawnName");
+
+            if (participantCount === 0) {
+                alert("請先產製籤筒！");
+                return;
+            }
+
+            if (drawnNumbers.length >= participantCount) {
+                alert("已經抽完所有號碼！");
+                return;
+            }
+
+            var randomNumber;
+            do {
+                randomNumber = Math.floor(Math.random() * participantCount) + 1;
+            } while (drawnNumbers.includes(randomNumber));
+
+            drawnNumbers.push(randomNumber);
+            var row = participantList.rows[Math.floor((randomNumber - 1) / 5)];
+            var cell = row.cells[(randomNumber - 1) % 5 * 2 + 1];
+            cell.innerHTML = participantName;
+		
+	
+			// 顯示抽籤號碼和參與者姓名
+			drawnNumberElement.innerHTML = randomNumber;
+			drawnNumberElement.classList.add("drawn-number");
+
+			// 顯示姓名元素，只對姓名應用樣式
+			drawnNameElement.innerHTML = "<span class='drawn-name'>" + participantName + "</span>";
+			drawnNameElement.style.display = "inline";
+			
+			// 先顯示抽籤號碼，然後延遲一段時間再顯示抽籤完成提示訊息
+			setTimeout(function() {
+			alert("抽籤完成");
+			}, 100); // 延遲 0.1 秒後顯示提示
+						
+		}
+		
+		function exportToCSV() {
+            if (participantCount === 0) {
+                alert("請先產製籤筒！");
+                return;
+            }
+
+            var csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "序號,姓名\n";
+
+            for (var i = 0; i < drawnNumbers.length; i++) {
+                var row = participantList.rows[Math.floor((drawnNumbers[i] - 1) / 5)];
+                var cell = row.cells[(drawnNumbers[i] - 1) % 5 * 2 + 1];
+                var name = cell.innerHTML.trim();
+                csvContent += drawnNumbers[i] + "," + name + "\n";
+            }
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "抽籤結果.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+		
+		
+    </script>
+</body>
+</html>
