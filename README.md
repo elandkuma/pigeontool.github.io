@@ -1,1 +1,1 @@
-# pigeontool.github.io
+這是用來計算抵價地權利價值的工具，但僅供參考
