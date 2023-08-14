@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>抵價地權利價值及面積計算</title>
+	<style>
+		body {
+            font-family: "Helvetica", "Arial","LiHei Pro","黑體-繁","微軟正黑體", sans-serif; /* 設定整個頁面的字型 */
+			text-align: center; /* 將整個頁面的內容置中 */
+			background-color: #1a1a1a; /* 設定背景顏色 */
+			color: #ffffff; /* 設定文字顏色 */
+        }
+		h1 {
+			font-size: 42px; /* 設定大標題字型 */
+			color: #02C874;
+			margin-top: 40px;
+			margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 28px; /* 設定中標題字型 */
+			color: #BBFFBB;
+			margin-top: 10px;
+			margin-bottom: 30px;
+        }
+		table {
+			border: 4px solid #0072E3; /* 調整表格最外框線顏色 */
+			padding: 12px;
+			text-align: center;
+			background-color: #3C3C3C; /* 設定背景顏色 */
+		}
+		th, td {
+			border: 3px solid #D9FFFF; /* 調整表格內框線顏色 */
+			padding: 10px;
+			text-align: center;
+		}
+		th.step {
+			/* 調整步驟欄位的寬度 */
+			width: 8%; /* 您可以調整這個數值 */
+			font-size: 24px; /* 設定字型大小 */
+			color: #FF8F59; /* 設定步驟字樣顏色 */
+		}
+		th.formula-header {
+			/* 調整公式欄位的寬度 */
+			width: 62%; /* 您可以調整這個數值 */
+			font-size: 24px; /* 設定字型大小 */
+			color: #FF8F59; /* 設定公式字樣顏色 */
+		}
+		th.note {
+			/* 調整備註欄位的寬度 */
+			width: 30%; /* 您可以調整這個數值 */
+			font-size: 24px; /* 設定字型大小 */
+			color: #FF8F59; /* 設定備註字樣顏色 */
+		}
+		input[type="number"] {
+			width: 180px;
+			padding: 8px;
+			border: 1px solid #FF8EFF;
+			border-radius: 6px;
+			font-size: 12px;
+			color: #555;
+		}
+		/* 調整步驟四、五計算結果樣式 */
+		.count-result {
+        font-size: 28px;
+        color: #00FFFF; /* 天空藍色 */
+        font-weight: bold;
+		}
+		 /* 調整步驟標題的樣式 */
+		.step-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #FF8F59; /* 調整步驟一至五的顏色 */		
+    }
+	
+		/* 調整公式內文的顏色 */			
+		.formula-body {
+		font-size: 16px;
+        font-weight: bold;
+        color: #FFFF37; 
+		}
+		
+	</style>
+
+</head>
+<body>
+
+<h1>大羅東地區治水防災區段徵收案</h1>
+<h2>抵價地權利價值及面積計算（單位：元／平方公尺）</h2>
+
+<table>
+    <tr>
+        <th class="step">步驟</th>
+		<th class="formula-header">公式</th>
+		<th class="note">備註</th>
+    </tr>
+    <tr>
+        <td class="step-title">步驟一</td>
+        <td class="formula-body">全區預計抵價地面積（A） =
+            <input type="number" id="landArea" placeholder="徵收土地總面積(L)">
+            ×
+            <input type="number" id="landRatio" placeholder="抵價地比例%">
+            <button onclick="calculateArea()">計算</button>
+            <br><span id="formula1"></span></br>
+        </td>
+		<td></td>
+    </tr>
+    <tr>
+        <td class="step-title">步驟二</td>
+        <td class="formula-body">預計抵價地之總地價（V） =
+            （<input type="number" id="totalArea" placeholder="供抵價地分配之總面積"> ×
+            <input type="number" id="unitPrice" placeholder="評定之單位地價">） ×
+            （<span id="formula1">全區預計抵價地面積（A）</span> ÷ 
+            <input type="number" id="planningArea" placeholder="供抵價地分配之總面積">
+            ）
+            <button onclick="calculateValue()">計算</button>
+            <br><span id="formula2"></span></br>
+        </td>
+		<td></td>
+    </tr>
+    <tr>
+        <td class="step-title">步驟三</td>
+        <td class="formula-body">全區之徵收土地補償總地價（M） =
+            <input type="number" id="compensationPrice" placeholder="土地徵收補償價格/每平方公尺">
+            ×
+            <span id="landAreaResult">徵收土地總面積(L)</span>
+            <button onclick="calculateCompensation()">計算</button>
+            <br><span id="formula3"></span></br>
+        </td>
+		<td></td>
+    </tr>
+	<tr>
+		<td class="step-title">步驟四</td>
+		<td class="formula-body">預計抵價地之總地價（V）<span id="valueResult"></span>，
+			全區之徵收土地補償總地價（M） <span id="compensationResult"></span>			
+			<br>
+			輸入領得補償地價額（X）：<input type="number" id="sValue" placeholder="輸入領得補償地價額">
+			<button onclick="calculateVS()">計算</button>
+			<br>
+			X÷M*V=權利價值：<span class="count-result" id="vsResult"></span>
+			<span id="formula4"></span>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+	    <td class="step-title">步驟五</td>
+		<td class="formula-body">各原土地所有權人領回抵價地之面積 =
+			權利價值 ÷
+			<input type="number" id="unitPriceStep5" placeholder="評定單位地價">
+			<button onclick="calculateStep5()">計算</button>
+			<br>
+			領回抵價地面積：<span class="count-result" id="step5Result"></span>
+			<span class="count-result" id="squareFeetResult"></span>
+			
+		</td>
+		<td></td>
+	</tr>
+</table>
+
+<div class="explanatory-text">
+    <p style="font-size: 22px; color: #FF0000; text-align: center;"><strong>
+        注意：本計算表僅是「概估」，實際上法條的公式參數會需要徵收當時所評估之數值，不確定性太高，實際上仍以申請發給抵價地之核定結果為準</strong>
+    </p>
+</div>
+
+<script>
+	var valueResult = 0; // 用於存儲步驟二的計算結果（V）
+	var compensationResult = 0; // 用於存儲步驟三的計算結果（M）
+	var vsResult = 0; // 用於存儲步驟四的計算結果（VS）
+
+    function formatNumber(number) {
+        return number.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+	//計算步驟一公式
+    function calculateArea() {
+        var landArea = parseFloat(document.getElementById("landArea").value);
+        var landRatio = parseFloat(document.getElementById("landRatio").value);
+        var result = landArea * landRatio / 100;
+        document.getElementById("formula1").textContent = "全區預計抵價地面積（A） = " + formatNumber(result);
+    }
+    //計算步驟二公式
+    function calculateValue() {
+        var totalArea = parseFloat(document.getElementById("totalArea").value);
+        var unitPrice = parseFloat(document.getElementById("unitPrice").value);
+        var calculationA = parseFloat(document.getElementById("formula1").textContent.split('=')[1].replace(/,/g, '')); // Remove commas
+        var planningArea = parseFloat(document.getElementById("planningArea").value);
+        var result = (totalArea * unitPrice) * (calculationA / planningArea);
+        document.getElementById("formula2").textContent = "預計抵價地之總地價（V） = " + formatNumber(result);
+		valueResult = result;
+		var valueResultElement = document.getElementById("valueResult");
+		valueResultElement.textContent = formatNumber(result);
+    }
+    //計算步驟三公式
+    function calculateCompensation() {
+        var compensationPrice = parseFloat(document.getElementById("compensationPrice").value);
+        var landArea = parseFloat(document.getElementById("landArea").value);
+        document.getElementById("landAreaResult").textContent = formatNumber(landArea);
+        var result = compensationPrice * landArea;
+        document.getElementById("formula3").textContent = "全區之徵收土地補償總地價（M） = " + formatNumber(result);
+		compensationResult = result;
+		var compensationResultElement = document.getElementById("compensationResult");
+		compensationResultElement.textContent = formatNumber(result);
+    }
+	//計算步驟四公式
+	function calculateActualCompensation() {
+		var kValue = parseFloat(document.getElementById("kValue").value);
+		var result = (valueResult - compensationResult) * kValue;
+		document.getElementById("formula4").textContent = "全區之實際取得土地補償總地價（R） = " + formatNumber(result);
+	}
+	
+	//計算步驟四公式之二	
+	function calculateVS() {
+        var sValue = parseFloat(document.getElementById("sValue").value);
+        if (!isNaN(valueResult) && !isNaN(compensationResult)) { // 檢查是否為有效值
+            vsResult = (sValue / compensationResult) * valueResult;
+            document.getElementById("vsResult").textContent = formatNumber(vsResult)+"元";
+            //calculateStep5(); // 呼叫計算步驟五的函數，之前留著的效果是在計算步驟四之後，步驟五會跳一個nan出來
+        } else {
+            alert("請先計算步驟二和步驟三。");
+        }
+    }
+	//計算步驟五公式
+	function calculateStep5() {
+        var unitPriceStep5 = parseFloat(document.getElementById("unitPriceStep5").value);
+        if (!isNaN(vsResult)) { // 檢查是否為有效值
+            var step5Result = vsResult / unitPriceStep5;
+            document.getElementById("step5Result").textContent = formatNumber(step5Result)+"平方公尺";	
+			
+			var squareFeetResult = step5Result * 0.3025; // 計算坪數換算結果
+        document.getElementById("squareFeetResult").textContent = "(" + formatNumber(squareFeetResult) + "坪)";
+			
+        } else {
+            document.getElementById("step5Result").textContent = "待計算"; // 若 vsResult 為 NaN，則重置結果為 "待計算"
+			document.getElementById("squareFeetResult").textContent = "待計算"; // 清空坪數換算結果
+        }
+    }
+	
+	
+</script>
+
+
+<footer>
+        <p style="font-size: 14px; color: #E0E0E0; text-align: right;"> 製作：鴿子 2023.8.14</p>
+    </footer>
+</body>
+</html>
