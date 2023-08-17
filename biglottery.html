@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>樂透抽選程式</title>
+    <style>
+		body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+	
+		 .center {
+			text-align: center;
+		}
+	
+	
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 12px;
+        }
+        th {
+            background-color: #f2f2f2;		
+        }
+			
+	    button {
+            margin-top: 10px;
+        }
+		
+		/* 下面是選擇號碼的區域樣式設定 */
+		.select-number {
+			font-size: 16px;
+			margin: auto;
+			padding: 10px;
+			background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+			text-align: center;
+		}
+	
+		/* 下面是已被選擇號碼的區域樣式設定 */
+		.selected-number {
+			font-size: 16px;
+			margin: auto;
+			padding: 10px;			
+			text-align: center;
+		}
+		
+		.draw-number {
+			font-size: 16px;
+			margin: auto;
+			padding: 10px;			
+			text-align: center;
+			background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+		}
+		
+		button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+			
+		
+    </style>
+</head>
+<body>
+    <div class="center"><h1>大樂透摸擬抽選程式</h1></div>
+    
+    <div class="select-number">
+        <table>
+            <tr>
+                <th colspan="7">選擇彩卷號碼</th>
+            </tr>
+            <tr>
+                <script>
+                    for (let number = 1; number <= 49; number++) {
+                        document.write(`
+                            <td><input type="checkbox" value="${number}">${number}</td>
+                        `);
+
+                        if (number % 7 === 0) {
+                            document.write('</tr><tr>');
+                        }
+                    }
+                </script>
+            </tr>
+        </table>
+        <button onclick="completeSelection()">自選完成</button>
+        <button onclick="randomSelection()">電腦選號</button>
+    </div>
+	
+	 <div class="draw-number">
+        <button onclick="drawLottery()">啟動開獎機</button>
+        <button onclick="checkWinning()">開始對獎</button>
+        <table id="drawResult">
+            <tr>
+                <th>開出號碼</th>
+                <th>特別號</th>
+            </tr>
+        </table>
+		<table id="statisticsTable">
+        <tr>
+            <th>獎項</th>
+            <th>中獎數量</th>
+        </tr>
+        <tr>
+            <td>頭獎</td>
+            <td id="headPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>二獎</td>
+            <td id="secondPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>三獎</td>
+            <td id="thirdPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>四獎</td>
+            <td id="fourthPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>2000元</td>
+            <td id="twoThousandPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>1000元</td>
+            <td id="thousandPrizeCount">0</td>
+        </tr>
+        <tr>
+            <td>400元</td>
+            <td id="fourHundredPrizeCount">0</td>
+        </tr>
+		</table>
+		
+    </div>
+	
+    <div class="selected-number">
+        <h2>已持有的彩卷</h2>
+        <table id="selectedNumbersTable">
+            <tr>
+                <th>彩卷號碼</th>
+                <th>中獎結果</th>
+                <th>中獎金額</th>
+            </tr>
+        </table>
+    </div>
+	
+	
+  
+
+    <script>
+        let selectedNumbers = [];
+
+        function completeSelection() {
+            const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+            if (checkboxes.length !== 6) {
+                alert("請選擇 6 個號碼。");
+                return;
+            }
+
+            selectedNumbers = Array.from(checkboxes, checkbox => checkbox.value);
+
+            const selectedNumbersTable = document.getElementById("selectedNumbersTable");
+            const newRow = selectedNumbersTable.insertRow();
+            const selectedNumbersCell = newRow.insertCell();
+            selectedNumbersCell.textContent = selectedNumbers.join(", ");
+            newRow.insertCell();
+            newRow.insertCell();
+        }
+
+        function randomSelection() {
+            const maxCombinations = 10000;
+            const numInput = prompt("請輸入要生成的隨機組合數量（最多10000組），數量多請等待產製，不要再重複執行：");
+            const numCombinations = parseInt(numInput, 10);
+
+            if (isNaN(numCombinations) || numCombinations <= 0) {
+                alert("請輸入有效的數字。");
+                return;
+            }
+
+            if (numCombinations > maxCombinations) {
+                alert(`最多只能生成 ${maxCombinations} 組隨機組合。`);
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll("input[type='checkbox']");
+            const selectedNumbersTable = document.getElementById("selectedNumbersTable");
+            selectedNumbersTable.innerHTML = `
+                <tr>
+                    <th>彩卷號碼</th>
+                    <th>中獎結果</th>
+                    <th>中獎金額</th>
+                </tr>
+            `;
+
+            for (let i = 0; i < numCombinations; i++) {
+                const selectedIndexes = new Set();
+                while (selectedIndexes.size < 6) {
+                    selectedIndexes.add(Math.floor(Math.random() * 49) + 1);
+                }
+
+                checkboxes.forEach((checkbox, index) => {
+                    checkbox.checked = selectedIndexes.has(index + 1);
+                });
+                completeSelection();
+            }
+        }
+
+        function drawLottery() {
+            const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+            if (checkboxes.length > 6) {
+                alert("一次最多只能選擇 6 個號碼。");
+                return;
+            }
+
+            const drawResultTable = document.getElementById("drawResult");
+            drawResultTable.innerHTML = "<tr><th>中獎號碼</th><th>特別號</th></tr>";
+
+            selectedNumbers = Array.from(checkboxes, checkbox => checkbox.value);
+
+            const drawNumbers = Array.from({length: 49}, (_, i) => i + 1);
+            const winningNumbers = [];
+
+            for (let i = 0; i < 6; i++) {
+                const randomIndex = Math.floor(Math.random() * drawNumbers.length);
+                const randomNumber = drawNumbers.splice(randomIndex, 1)[0];
+                winningNumbers.push(randomNumber);
+            }
+
+            let specialNumber = Math.floor(Math.random() * 49) + 1;
+            while (winningNumbers.includes(specialNumber)) {
+                specialNumber = Math.floor(Math.random() * 49) + 1;
+            }
+
+            const drawRow = drawResultTable.insertRow();
+            const drawNumbersCell = drawRow.insertCell();
+            drawNumbersCell.textContent = winningNumbers.join(", ");
+            const specialNumberCell = drawRow.insertCell();
+            specialNumberCell.textContent = specialNumber;
+        }
+
+        function checkWinning() {
+            const drawNumbers = Array.from(document.querySelectorAll("#drawResult td:nth-child(1)"))[0].textContent.split(", ");
+            const specialNumber = Number(document.querySelector("#drawResult td:nth-child(2)").textContent);
+            const selectedNumbersTable = document.getElementById("selectedNumbersTable");
+            const selectedNumbersRows = selectedNumbersTable.querySelectorAll("tr");
+
+            selectedNumbersRows.forEach((row, index) => {
+				if (index === 0) return;
+
+					const selectedNumbers = row.cells[0].textContent.split(", ");
+					const specialNumberMatch = selectedNumbers.includes(String(specialNumber));
+					const matchingNumbers = selectedNumbers.filter(number => drawNumbers.includes(number));
+					const prize = calculatePrize(matchingNumbers, specialNumberMatch);
+
+                row.cells[1].textContent = (prize === "頭獎" || prize === "二獎" || prize === "三獎" || prize === "四獎")
+				? `中獎號碼：${matchingNumbers.join(", ")}，特別號：${specialNumberMatch ? specialNumber : '無'}，${prize}`
+				: (prize > 0 ? `中獎號碼：${matchingNumbers.join(", ")}，特別號：${specialNumberMatch ? specialNumber : '無'}` : "沒有中獎。");
+
+                row.cells[2].textContent = typeof prize === 'number' ? `${prize}元` : prize;
+				
+				if (prize === "頭獎") {
+					incrementStatistic("headPrizeCount");
+				} else if (prize === "二獎") {
+				incrementStatistic("secondPrizeCount");
+				} else if (prize === "三獎") {
+				incrementStatistic("thirdPrizeCount");
+				} else if (prize === "四獎") {
+				incrementStatistic("fourthPrizeCount");
+				} else if (prize === 2000) {
+				incrementStatistic("twoThousandPrizeCount");
+				} else if (prize === 1000) {
+				incrementStatistic("thousandPrizeCount");
+				} else if (prize === 400) {
+				incrementStatistic("fourHundredPrizeCount");
+				}							
+            });
+
+            const totalPrize = Array.from(selectedNumbersRows).slice(1).reduce((sum, row) => {
+                const prizeText = row.cells[2].textContent;
+                const prizeValue = parseInt(prizeText, 10);
+                return !isNaN(prizeValue) ? sum + prizeValue : sum;
+            }, 0);
+
+            const totalPrizeRow = drawResult.insertRow();
+            const totalPrizeCell = totalPrizeRow.insertCell();
+            totalPrizeCell.colSpan = 3;
+            totalPrizeCell.style.textAlign = "center";
+            totalPrizeCell.textContent = `總獎金金額：${totalPrize}元`;
+        }
+
+        function calculatePrize(matchingNumbers, specialNumberMatch) {
+            const numMatches = matchingNumbers.length;
+            const hasSpecialNumber = specialNumberMatch;
+
+            if ((numMatches === 2 && hasSpecialNumber) || (numMatches === 3 && !hasSpecialNumber) || (numMatches === 2 && hasSpecialNumber)) {
+                return 400;
+            } else if (numMatches === 3 && hasSpecialNumber) {
+                return 1000;
+            } else if (numMatches === 4) {
+                return hasSpecialNumber ? "四獎" : 2000;
+            } else if (numMatches === 5) {
+                return hasSpecialNumber ? "二獎" : "三獎";
+            } else if (numMatches === 6) {
+                return "頭獎";
+            } else {
+                return 0;
+            }
+        }
+		
+		function incrementStatistic(id) {
+        const statisticCell = document.getElementById(id);
+        const currentCount = parseInt(statisticCell.textContent);
+        statisticCell.textContent = currentCount + 1;
+    }
+		
+		
+    </script>
+</body>
+</html>
