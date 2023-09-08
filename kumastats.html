@@ -22,16 +22,18 @@
     border: 5px solid #5B5B5B;
     padding: 5px; 
     background-color: #f5f5f5;	
+	margin:auto;
 	}
 	
 	/* 子元素2，用以描述角色能力值 */
   .character-info {
 	width: 400px; 
-	padding: 10px;
+	padding: 5px;
 	background-color: #f5f5f5;
 	border: 5px solid #5B5B5B;
 	border-radius: 7px;
 	text-align: left;
+	margin:auto;
 	}
 	
 	/* 子元素2，用以描述角色能力值標題格式 */
@@ -76,7 +78,12 @@
   
   /* 新增Buff的樣式的程式碼<span class="bonus-value">-29</span> */
   
-  .bonus-value {
+  .bonus-goodvalue {
+    color: #00BB00;/* 綠色 */
+	font-size: 14px;
+  }
+  
+  .bonus-badvalue {
     color: #FF0000;/* 紅色 */
 	font-size: 14px;
   }
@@ -142,7 +149,7 @@
 </style>
 </head>
 	<body>
-		<div class="character-area">
+		<!-- 取消父容器<div class="character-area"> -->
 			<div class="character-card">
 				<h2>等級：28</h2>
 				<h2>KUMA</h2>
@@ -160,7 +167,7 @@
 					</div>
 					<div class="attribute">
 						<span class="attribute-label">魔力：</span>
-						<span class="attribute-value" id="mp-value">299/306</span>
+						<span class="attribute-value" id="mp-value">270/306</span>
 					</div>
 					<div class="attribute">
 						<span class="attribute-label">力量：</span>
@@ -172,7 +179,7 @@
 					</div>
 					<div class="attribute">
 						<span class="attribute-label">智力：</span>
-						<span class="attribute-value">188<span class="bonus-value">-37</span></span>
+						<span class="attribute-value">188<span class="bonus-badvalue">-37</span></span>
 					</div>
 					<div class="attribute">
 						<span class="attribute-label">防禦：</span>
@@ -184,7 +191,7 @@
 					</div>
 					<div class="attribute">
 						<span class="attribute-label">精神：</span>
-						<span class="attribute-value">152</span>
+						<span class="attribute-value">152<span class="bonus-goodvalue">+30</span></span>
 					</div>
 				</div>
   
@@ -230,7 +237,7 @@
 						</div>
 						<!-- 新增Buff資訊 -->
 						<div class="buff-info">
-							所有負面狀態造成的效果減半。
+							精神+20%，所有負面狀態造成的效果減半。
 						</div>
 					</div>
 					<!-- 根據需要添加更多Buff -->
@@ -275,7 +282,7 @@
 				</h3>
 					<p>影響魔力成長上限、魔力回復能力，並小幅度影響日常所有事件處理效率。</p>
 			</div>
-		</div>
+		<!-- 取消父容器</div> -->
  
 
 		<script>
