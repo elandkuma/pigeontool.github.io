@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鴿子羽球團隊友分隊抽籤</title>
+  <style>
+    /* 簡單增加背景圖片及基本樣式 */
+    body {
+      font-family: Arial, sans-serif;
+	  background-image: url('001.PNG');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .participants-list {
+      list-style: none;
+      padding: 0;
+    }
+      
+    h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+	  margin: 10px auto;	 
+	  text-align: center;
+    }
+    .participant-input {
+      display: flex;
+      align-items: center;
+    }
+    .participant-input input {
+      flex: 1;
+    }
+    .participant-input button {
+      margin-left: 10px;
+    }
+    .participant-input .file-info {
+      margin-left: 10px;
+    }
+    .participant {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .participant .button-group {
+      display: flex;
+    }
+    .participant .button-group button {
+      margin-left: 5px;
+    }
+	
+	#participantsTable th,
+    #participantsTable td {
+      text-align: center; /* 表格內容文字置中 */
+    }
+	
+	.custom-button {
+	  font-size: 30px;
+	  padding: 20px 20px;
+	  transform: translateX(200%);
+	  margin: 20px auto;
+	}
+
+	/* 新增表格樣式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>鴿子羽球團隊友分隊抽籤</h1>
+    <div class="participant-input">
+      <input type="text" id="participantName" placeholder="請輸入參與者姓名：">
+      <button onclick="addParticipant()">新增球友</button>
+      <div>
+        <input type="file" id="csvFile" accept=".csv" style="display: none;">
+        <button onclick="chooseFile()">選擇檔案</button>
+        <span class="file-info" id="fileInfo"></span>
+      </div>
+      <button onclick="importCSV()">匯入CSV</button>
+      <button onclick="exportCSV()">匯出CSV</button>
+    </div>
+    <!-- HTML -->
+	<button onclick="shuffleParticipants()" class="custom-button">開始抽籤</button>
+    <table id="participantsTable">
+      <thead>
+        <tr>
+          <th>順序</th>
+          <th>姓名</th>
+		  <th>操作</th>
+        </tr>
+      </thead>
+      <tbody class="participants-list" id="participantsList">
+      </tbody>
+    </table>
+	  <button onclick="checkUncommonCharacters()">檢查罕用字</button>
+	  <button onclick="checkDuplicateNames()">檢查重複姓名</button>
+  </div>
+  <script>
+
+    const participants = [];
+
+    function addParticipant() {
+      const participantNameInput = document.getElementById("participantName");
+      const participantName = participantNameInput.value.trim();
+
+      if (participantName === "") {
+        alert("請輸入有效的姓名！");
+        return;
+      }
+
+      participants.push(participantName);
+      participantNameInput.value = "";
+      participantNameInput.focus();
+      displayParticipants();
+    }
+
+    function removeParticipant(index) {
+      participants.splice(index, 1);
+      displayParticipants();
+    }
+
+    function editParticipant(index) {
+      const newName = prompt("請輸入新的參與者姓名：", participants[index]);
+      if (newName !== null && newName.trim() !== "") {
+        participants[index] = newName.trim();
+        displayParticipants();
+      }
+    }
+
+     function displayParticipants() {
+      const participantsList = document.getElementById("participantsList");
+      participantsList.innerHTML = '';
+
+      participants.forEach((participant, index) => {
+        const row = `<tr id="row-${index}"> <!-- 新增 ID 屬性 -->
+                      <td>${index + 1}</td>
+                      <td>${participant}</td>
+                      <td>
+                        <button onclick="editParticipant(${index})">修改</button>
+                        <button onclick="removeParticipant(${index})">刪除</button>
+                      </td>
+                    </tr>`;
+        participantsList.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    function shuffleParticipants() {
+      if (participants.length < 2) {
+        alert("請至少新增兩位參與者！");
+        return;
+      }
+
+      const startButton = document.querySelector(".custom-button");
+      startButton.disabled = true;
+
+      for (let i = participants.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [participants[i], participants[j]] = [participants[j], participants[i]];
+      }
+
+      displayParticipants();
+
+      setTimeout(() => {
+        alert("抽籤完成");
+        startButton.disabled = false;
+      }, 100);
+    }
+
+    function chooseFile() {
+      const csvFileInput = document.getElementById("csvFile");
+      csvFileInput.click();
+    }
+
+    function updateFileInfo() {
+      const csvFileInput = document.getElementById("csvFile");
+      const fileInfo = document.getElementById("fileInfo");
+      const file = csvFileInput.files[0];
+      if (file) {
+        const fileName = file.name.length > 5 ? file.name.substring(0, 5) + "..." : file.name;
+        fileInfo.textContent = "已選擇檔案：" + fileName;
+      } else {
+        fileInfo.textContent = "";
+      }
+    }
+
+    function importCSV() {
+      const csvFileInput = document.getElementById("csvFile");
+      const file = csvFileInput.files[0];
+
+      if (!file) {
+        alert("請選擇要匯入的CSV檔案！");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target.result;
+        const lines = content.split("\n");
+
+        participants.length = 0;
+
+        lines.forEach((line) => {
+          const participantName = line.trim();
+          if (participantName !== "") {
+            participants.push(participantName);
+          }
+        });
+
+        displayParticipants();
+        alert("CSV匯入完成");
+      };
+
+      reader.readAsText(file);
+    }
+
+    function exportCSV() {
+      if (participants.length === 0) {
+        alert("目前沒有參與者，無法匯出CSV檔案！");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      participants.forEach((participant, index) => {
+        csvContent += `${index + 1},${participant}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "抽籤結果.csv");
+      document.body.appendChild(link);
+      link.click();
+    }
+	
+	function checkUncommonCharacters() {
+        const uncommonCharacters = /[^\u4E00-\u9FA5\uF900-\uFA2D]/; // 正則表達式，只匹配繁體中文字符
+
+		let uncommonFound = false;
+		let scrollToIndex = -1;
+
+		participants.forEach((participant, index) => {
+			if (uncommonCharacters.test(participant)) {
+				uncommonFound = true;
+			if (scrollToIndex === -1) {
+				scrollToIndex = index;
+				}
+			}
+		});
+
+  if (uncommonFound) {
+    alert(`姓名 "${participants[scrollToIndex]}" 包含罕用字或不正常顯示的繁體中文字元。`);
+    const rowElement = document.getElementById(`row-${scrollToIndex}`);
+    rowElement.scrollIntoView();
+  } else {
+    alert("所有參與者姓名皆正常顯示繁體中文字。");
+        }
+      }
+
+	function checkDuplicateNames() {
+        const nameSet = new Set(); // 使用 Set 來檢查重複姓名
+        let duplicateFound = false;
+
+        participants.forEach((participant) => {
+          if (nameSet.has(participant)) {
+            duplicateFound = true;
+            alert(`姓名 "${participant}" 在抽籤結果中重複出現。`);
+          } else {
+            nameSet.add(participant);
+          }
+        });
+
+        if (!duplicateFound) {
+          alert("抽籤結果中沒有重複的姓名。");
+        }
+      }
+
+    document.getElementById("csvFile").addEventListener("change", updateFileInfo);
+  </script>
+</body>
+</html>
+
